@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"taskcli/task"
+	"time"
 
 	_ "github.com/lib/pq"
 )
@@ -103,8 +104,8 @@ func GetTaskById(id uint) (task.Task, error) {
 	return task, nil
 }
 
-func GetTasksByStatus(status string) ([]task.Task, error) {
-	var tasks []task.Task
+func GetTasksByStatus(status string) ([]*task.Task, error) {
+	var tasks []*task.Task
 	rows, err := db.Query(`
 		SELECT *
 		FROM tasks
@@ -124,9 +125,37 @@ func GetTasksByStatus(status string) ([]task.Task, error) {
 		if err != nil {
 			return nil, fmt.Errorf("unable to read row in database: %w", err)
 		}
-		tasks = append(tasks, task)
+		tasks = append(tasks, &task)
 	}
 	return tasks, nil
+}
+
+func GetDateWithQuantity() (map[task.Day]int, error) {
+	daysQuantity := make(map[task.Day]int)
+	rows, err := db.Query(`
+		SELECT 
+			creation_time, COUNT(creation_time)
+		FROM tasks
+		WHERE DATE_PART('month', now() - creation_time) <= 6
+		GROUP BY creation_time
+		ORDER BY creation_time
+		`)
+	if err != nil {
+		return nil, fmt.Errorf("unable to get DayQuantity from database: %w", err)
+	}
+	for rows.Next() {
+		var day time.Time
+		var quantity int
+		err := rows.Scan(
+			&day,
+			&quantity,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("unable to read row DayQuantity in database: %w", err)
+		}
+		daysQuantity[task.Day{Year: day.Year(), Month: int(day.Month()), Day: day.Day()}] = quantity
+	}
+	return daysQuantity, nil
 }
 
 func createDBIfNotExist() error {
