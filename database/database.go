@@ -24,7 +24,7 @@ func Insert(task *task.Task) error {
 	_, err := db.Exec(`
 		INSERT INTO tasks(name, status, creation_time) 
 		VALUES($1, $2, $3)`,
-		task.Name, task.Status, task.CreationTime)
+		task.Name, task.Status, task.CreationTime.Format("2006-01-02"))
 	if err != nil {
 		return fmt.Errorf("error insert %#v in database: %v", *task, err)
 	}
@@ -194,7 +194,7 @@ func createTableIfNotExist() error {
 			id SERIAL PRIMARY KEY,
 			name CHARACTER VARYING,
 			status CHARACTER VARYING,
-			creation_time TIMESTAMP
+			creation_time TIMESTAMP WITHOUT TIME ZONE
 		)`)
 	if err != nil {
 		return fmt.Errorf("error create table in database: %v", err)
