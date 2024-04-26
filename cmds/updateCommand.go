@@ -2,9 +2,10 @@ package cmds
 
 import (
 	"strconv"
-	"taskcli/database"
-	"taskcli/task"
 	"time"
+
+	"github.com/LLIEPJIOK/taskcli/database"
+	"github.com/LLIEPJIOK/taskcli/task"
 
 	"github.com/spf13/cobra"
 )

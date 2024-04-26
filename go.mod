@@ -1,6 +1,6 @@
-module taskcli
+module github.com/LLIEPJIOK/taskcli
 
-go 1.22.0
+go 1.22
 
 require (
 	github.com/charmbracelet/lipgloss v0.10.0

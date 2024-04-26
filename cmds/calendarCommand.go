@@ -3,9 +3,10 @@ package cmds
 import (
 	"fmt"
 	"log"
-	"taskcli/database"
-	"taskcli/task"
 	"time"
+
+	"github.com/LLIEPJIOK/taskcli/database"
+	"github.com/LLIEPJIOK/taskcli/task"
 
 	"github.com/spf13/cobra"
 )
@@ -43,8 +44,6 @@ func printCell(val, quantity int) {
 	}
 	var cell string
 	switch {
-	case quantity == 0:
-		cell = "\033[0;37;30m"
 	case quantity > 0 && quantity < 5:
 		cell = "\033[1;30;47m"
 	case quantity >= 5 && quantity < 10:

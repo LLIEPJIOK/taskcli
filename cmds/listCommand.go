@@ -2,8 +2,9 @@ package cmds
 
 import (
 	"fmt"
-	"taskcli/database"
-	"taskcli/task"
+
+	"github.com/LLIEPJIOK/taskcli/database"
+	"github.com/LLIEPJIOK/taskcli/task"
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/lipgloss/table"

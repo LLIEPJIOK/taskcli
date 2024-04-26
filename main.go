@@ -2,8 +2,9 @@ package main
 
 import (
 	"log"
-	"taskcli/cmds"
-	"taskcli/database"
+
+	"github.com/LLIEPJIOK/taskcli/cmds"
+	"github.com/LLIEPJIOK/taskcli/database"
 )
 
 func main() {

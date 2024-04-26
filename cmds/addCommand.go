@@ -1,8 +1,8 @@
 package cmds
 
 import (
-	"taskcli/database"
-	"taskcli/task"
+	"github.com/LLIEPJIOK/taskcli/database"
+	"github.com/LLIEPJIOK/taskcli/task"
 
 	"github.com/spf13/cobra"
 )

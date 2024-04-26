@@ -4,17 +4,18 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"taskcli/task"
 	"time"
+
+	"github.com/LLIEPJIOK/taskcli/task"
 
 	_ "github.com/lib/pq"
 )
 
 const (
-	host     = "localhost"
+	host     = "db"
 	port     = 5432
 	user     = "postgres"
-	password = "123409874567"
+	password = "secret"
 	dbName   = "taskcli"
 )
 

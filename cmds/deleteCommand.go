@@ -3,7 +3,8 @@ package cmds
 import (
 	"fmt"
 	"strconv"
-	"taskcli/database"
+
+	"github.com/LLIEPJIOK/taskcli/database"
 
 	"github.com/spf13/cobra"
 )
