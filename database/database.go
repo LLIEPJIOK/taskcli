@@ -16,13 +16,15 @@ const (
 	port     = 5432
 	user     = "postgres"
 	password = "secret"
-	dbName   = "taskcli"
 )
 
-var db *sql.DB
+var (
+	databaseName = "taskcli"
+	dataBase     *sql.DB
+)
 
 func Insert(task *task.Task) error {
-	_, err := db.Exec(`
+	_, err := dataBase.Exec(`
 		INSERT INTO tasks(name, status, creation_time) 
 		VALUES($1, $2, $3)`,
 		task.Name, task.Status, task.CreationTime.Format("2006-01-02"))
@@ -33,7 +35,7 @@ func Insert(task *task.Task) error {
 }
 
 func Delete(id uint) error {
-	_, err := db.Exec(`
+	_, err := dataBase.Exec(`
 		DELETE FROM tasks
 		WHERE id = $1`,
 		id)
@@ -49,7 +51,7 @@ func Update(task *task.Task) error {
 		return err
 	}
 	origTask.Merge(task)
-	_, err = db.Exec(`
+	_, err = dataBase.Exec(`
 		UPDATE tasks
 		SET 
 			name = $1,
@@ -64,7 +66,7 @@ func Update(task *task.Task) error {
 
 func GetAllTasks() ([]task.Task, error) {
 	var tasks []task.Task
-	rows, err := db.Query(`
+	rows, err := dataBase.Query(`
 		SELECT *
 		FROM tasks`,
 	)
@@ -89,7 +91,7 @@ func GetAllTasks() ([]task.Task, error) {
 
 func GetTaskById(id uint) (task.Task, error) {
 	var task task.Task
-	err := db.QueryRow(`
+	err := dataBase.QueryRow(`
 		SELECT *
 		FROM tasks
 		WHERE id = $1`,
@@ -105,9 +107,9 @@ func GetTaskById(id uint) (task.Task, error) {
 	return task, nil
 }
 
-func GetTasksByStatus(status string) ([]*task.Task, error) {
-	var tasks []*task.Task
-	rows, err := db.Query(`
+func GetTasksByStatus(status string) ([]task.Task, error) {
+	var tasks []task.Task
+	rows, err := dataBase.Query(`
 		SELECT *
 		FROM tasks
 		WHERE status = $1`,
@@ -126,14 +128,14 @@ func GetTasksByStatus(status string) ([]*task.Task, error) {
 		if err != nil {
 			return nil, fmt.Errorf("unable to read row in database: %w", err)
 		}
-		tasks = append(tasks, &task)
+		tasks = append(tasks, task)
 	}
 	return tasks, nil
 }
 
-func GetDateWithQuantity() (map[task.Day]int, error) {
+func GetDaysWithQuantity() (map[task.Day]int, error) {
 	daysQuantity := make(map[task.Day]int)
-	rows, err := db.Query(`
+	rows, err := dataBase.Query(`
 		SELECT 
 			creation_time, COUNT(creation_time)
 		FROM tasks
@@ -154,7 +156,11 @@ func GetDateWithQuantity() (map[task.Day]int, error) {
 		if err != nil {
 			return nil, fmt.Errorf("unable to read row DayQuantity in database: %w", err)
 		}
-		daysQuantity[task.Day{Year: day.Year(), Month: int(day.Month()), Day: day.Day()}] = quantity
+		daysQuantity[task.Day{
+			Year:  day.Year(),
+			Month: int(day.Month()),
+			Day:   day.Day(),
+		}] = quantity
 	}
 	return daysQuantity, nil
 }
@@ -174,14 +180,14 @@ func createDBIfNotExist() error {
 		SELECT 1 
 		FROM pg_database 
 		WHERE datname = $1`,
-		dbName)
+		databaseName)
 	if err != nil {
 		return fmt.Errorf("error checking database existence: %w", err)
 	}
 	defer rows.Close()
 
 	if !rows.Next() {
-		_, err = db.Exec(`CREATE DATABASE ` + dbName)
+		_, err = db.Exec(`CREATE DATABASE ` + databaseName)
 		if err != nil {
 			return fmt.Errorf("error creating database: %w", err)
 		}
@@ -190,7 +196,7 @@ func createDBIfNotExist() error {
 }
 
 func createTableIfNotExist() error {
-	_, err := db.Exec(`
+	_, err := dataBase.Exec(`
 		CREATE TABLE IF NOT EXISTS tasks (
 			id SERIAL PRIMARY KEY,
 			name CHARACTER VARYING,
@@ -203,33 +209,33 @@ func createTableIfNotExist() error {
 	return nil
 }
 
-func openDB() error {
+func configure() error {
 	err := createDBIfNotExist()
 	if err != nil {
 		return err
 	}
 
 	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbName)
-	db, err = sql.Open("postgres", connStr)
+		host, port, user, password, databaseName)
+	dataBase, err = sql.Open("postgres", connStr)
 	if err != nil {
 		return fmt.Errorf("error open database: %w", err)
 	}
-	if err = db.Ping(); err != nil {
+	if err = dataBase.Ping(); err != nil {
 		return fmt.Errorf("error connecting to database: %w", err)
 	}
 
 	return createTableIfNotExist()
 }
 
-func CloseDB() {
-	if err := db.Close(); err != nil {
+func Close() {
+	if err := dataBase.Close(); err != nil {
 		log.Fatal("cannot close db:", err)
 	}
 }
 
 func init() {
-	err := openDB()
+	err := configure()
 	if err != nil {
 		log.Fatal(err)
 	}

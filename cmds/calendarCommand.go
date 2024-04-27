@@ -72,7 +72,7 @@ func printCells() {
 	}
 	sixMonthAgoDate := time.Now().AddDate(0, -6, 0)
 
-	daysQuantity, err := database.GetDateWithQuantity()
+	daysQuantity, err := database.GetDaysWithQuantity()
 	if err != nil {
 		log.Println(err)
 		return

@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	defer database.CloseDB()
+	defer database.Close()
 	if err := cmds.RootCommand.Execute(); err != nil {
 		log.Fatal("cannot execute root command:", err)
 	}

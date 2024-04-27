@@ -21,6 +21,13 @@ func New(name string) *Task {
 	return task
 }
 
+func (t *Task) Equal(other *Task) bool {
+	return t.ID == other.ID &&
+		t.Name == other.Name &&
+		t.Status == other.Status &&
+		t.CreationTime.Format("2006-01-02") == other.CreationTime.Format("2006-01-02")
+}
+
 func (orig *Task) Merge(t *Task) {
 	updateValues := reflect.ValueOf(t).Elem()
 	oldValues := reflect.ValueOf(orig).Elem()

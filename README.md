@@ -21,7 +21,7 @@ To start working with application, follow these steps in console:
    ```bash
    docker-compose up
    ```
-4. Open another console where you will write commandы. Each command has the following structure:
+4. Open another console where you will write commands. Each command has the following structure:
     ```bash
     docker exec -it taskcli-app-1 taskcli [COMMAND]
     ```
@@ -29,3 +29,8 @@ To start working with application, follow these steps in console:
     ```bash
     docker exec -it taskcli-app-1 taskcli info
     ```
+
+To run test type:
+   ```bash
+   docker exec -it taskcli-app-1 go test -v ./[folder with tests]/*
+   ```
